@@ -13,10 +13,21 @@ body {
   color: #1a1a1a;
 }
 
+body.game-page-active {
+  overflow: hidden;
+  background: #000;
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1rem 3rem;
+}
+
+.container.game-container-active {
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
 .card {
