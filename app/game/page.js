@@ -1,20 +1,19 @@
-import Link from "next/link";
+'use client'
 
 export default function GamePage() {
   return (
-    <section className="card">
-      <h1>Game Page</h1>
-      <p>The iframe below is a placeholder for your game.</p>
+    <section style={{ width: "100vw", height: "100vh", margin: 0 }}>
       <iframe
-        src="https://example.com"
-        title="Game iframe placeholder"
+        src="https://plane-game-pink.vercel.app/plane-game.html"
+        title="Game"
         loading="lazy"
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "none"
+        }}
+        allow="fullscreen"
       />
-      <nav className="nav">
-        <Link className="button" href="/questions-2">
-          Next Page
-        </Link>
-      </nav>
     </section>
   );
 }
