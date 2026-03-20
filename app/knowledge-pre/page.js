@@ -32,7 +32,11 @@ export default function QuestionsTwoPage() {
             </div>
           );
         })}
-
+        <p>
+          NB: Proceeding to the next page will open the game in your browser. 
+          Please allow the game a few seconds to begin once you select "Start".
+          Once you complete the game select "Finish" to load the next page. This may take a few seconds.
+        </p>
         <nav className="nav">
           <button className="button" type="submit">
             Next Page
