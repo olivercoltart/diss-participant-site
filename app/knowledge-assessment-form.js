@@ -1,9 +1,36 @@
+"use client";
+
+import { useState } from "react";
 import KnowledgeMapQuestion from "./knowledge-map-question";
 import { KNOWLEDGE_QUESTIONS, MAP_KNOWLEDGE_QUESTIONS } from "../lib/study-content";
 
 export default function KnowledgeAssessmentForm({ action, showPreStudyNotice = false }) {
+  const [validationMessage, setValidationMessage] = useState("");
+
+  function handleSubmit(event) {
+    const formData = new FormData(event.currentTarget);
+    const unansweredMapQuestions = MAP_KNOWLEDGE_QUESTIONS.filter((question, index) => {
+      const questionNumber = KNOWLEDGE_QUESTIONS.length + index + 1;
+      const answer = formData.get(`q${questionNumber}`);
+
+      return typeof answer !== "string" || !answer.trim();
+    });
+
+    if (unansweredMapQuestions.length > 0) {
+      event.preventDefault();
+      setValidationMessage(
+        `Please answer all map questions before continuing. Missing: ${unansweredMapQuestions
+          .map((question) => question.prompt)
+          .join(" ")}`,
+      );
+      return;
+    }
+
+    setValidationMessage("");
+  }
+
   return (
-    <form action={action}>
+    <form action={action} onSubmit={handleSubmit}>
       {KNOWLEDGE_QUESTIONS.map((question, index) => {
         const questionNumber = index + 1;
 
@@ -43,6 +70,8 @@ export default function KnowledgeAssessmentForm({ action, showPreStudyNotice = f
           "Finish" to load the next page. This may take a few seconds.
         </p>
       ) : null}
+
+      {validationMessage ? <p className="warning">{validationMessage}</p> : null}
 
       <nav className="nav">
         <button className="button" type="submit">
