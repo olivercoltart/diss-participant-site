@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getSql } from "../lib/db";
 import {
   KNOWLEDGE_QUESTIONS,
+  MAP_KNOWLEDGE_QUESTIONS,
   POST_STUDY_SECTIONS,
   PRE_STUDY_SECTIONS,
 } from "../lib/study-content";
@@ -30,18 +31,27 @@ function enumerateQuestions(sections, pageKey) {
 
 const PRE_STUDY_QUESTIONS = enumerateQuestions(PRE_STUDY_SECTIONS, "questions_pre");
 const POST_STUDY_QUESTIONS = enumerateQuestions(POST_STUDY_SECTIONS, "questions_post");
-const PRE_KNOWLEDGE_QUESTIONS = KNOWLEDGE_QUESTIONS.map((question, index) => ({
-  pageKey: "knowledge_pre",
-  sectionTitle: "Baseline Knowledge",
-  questionNumber: index + 1,
-  questionText: question.prompt,
-}));
-const POST_KNOWLEDGE_QUESTIONS = KNOWLEDGE_QUESTIONS.map((question, index) => ({
-  pageKey: "knowledge_post",
-  sectionTitle: "Baseline Knowledge",
-  questionNumber: index + 1,
-  questionText: question.prompt,
-}));
+
+function enumerateKnowledgeQuestions(pageKey) {
+  const multipleChoiceQuestions = KNOWLEDGE_QUESTIONS.map((question, index) => ({
+    pageKey,
+    sectionTitle: "Baseline Knowledge",
+    questionNumber: index + 1,
+    questionText: question.prompt,
+  }));
+
+  const mapQuestions = MAP_KNOWLEDGE_QUESTIONS.map((question, index) => ({
+    pageKey,
+    sectionTitle: "Map Knowledge",
+    questionNumber: KNOWLEDGE_QUESTIONS.length + index + 1,
+    questionText: question.prompt,
+  }));
+
+  return [...multipleChoiceQuestions, ...mapQuestions];
+}
+
+const PRE_KNOWLEDGE_QUESTIONS = enumerateKnowledgeQuestions("knowledge_pre");
+const POST_KNOWLEDGE_QUESTIONS = enumerateKnowledgeQuestions("knowledge_post");
 const PARTICIPANT_QUESTIONS = [
   {
     pageKey: "participant_questions",
