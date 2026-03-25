@@ -185,11 +185,6 @@ export default function KnowledgeMapQuestion({ questionNumber, prompt }) {
           </map>
         </div>
       </div>
-
-      <div className="map-question-status" aria-live="polite">
-        <span className="map-question-status-label">Selected:</span>{" "}
-        {selectedCountry || "No country selected"}
-      </div>
     </div>
   );
 }
