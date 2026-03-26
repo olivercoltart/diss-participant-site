@@ -234,7 +234,7 @@ export async function submitParticipantQuestions(formData) {
     `;
   }
 
-  redirect("/knowledge-pre");
+  redirect("/questions-pre");
 }
 
 export async function submitPreQuestions(formData) {
