@@ -2,7 +2,8 @@ create extension if not exists pgcrypto;
 
 create table if not exists participants (
   id uuid primary key default gen_random_uuid(),
-  consented_at timestamptz not null default now(),
+  consent_response text not null check (consent_response in ('agree', 'disagree')),
+  consented_at timestamptz,
   completed_at timestamptz
 );
 

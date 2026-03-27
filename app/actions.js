@@ -31,6 +31,13 @@ function enumerateQuestions(sections, pageKey) {
 
 const PRE_STUDY_QUESTIONS = enumerateQuestions(PRE_STUDY_SECTIONS, "questions_pre");
 const POST_STUDY_QUESTIONS = enumerateQuestions(POST_STUDY_SECTIONS, "questions_post");
+const CONSENT_QUESTION = {
+  pageKey: "welcome",
+  sectionTitle: "Study Consent Form",
+  questionNumber: 1,
+  questionText:
+    "Do you agree to voluntarily participate in this study and allow your data to be used for research purposes?",
+};
 
 function enumerateKnowledgeQuestions(pageKey) {
   const multipleChoiceQuestions = KNOWLEDGE_QUESTIONS.map((question, index) => ({
@@ -71,15 +78,14 @@ const PARTICIPANT_QUESTIONS = [
     pageKey: "participant_questions",
     sectionTitle: "Participant Questions",
     questionNumber: 3,
-    questionText: "Which of the following best represents your gender identity?",
+    questionText: "What is your gender?",
     fieldName: "gender",
   },
   {
     pageKey: "participant_questions",
     sectionTitle: "Participant Questions",
     questionNumber: 4,
-    questionText:
-      "Have you completed a higher education degree? (e.g. Bachelors, Masters, PhD, etc.)",
+    questionText: "What is your highest level of education?",
     fieldName: "higher_education",
   },
 ];
@@ -92,6 +98,18 @@ function getParticipantId() {
   }
 
   return participantId;
+}
+
+async function participantsHasConsentResponseColumn(sql) {
+  const [column] = await sql`
+    select 1
+    from information_schema.columns
+    where table_name = 'participants'
+      and column_name = 'consent_response'
+    limit 1
+  `;
+
+  return Boolean(column);
 }
 
 async function saveResponses(questionSet, formData) {
@@ -132,13 +150,58 @@ async function saveResponses(questionSet, formData) {
   }
 }
 
-export async function submitConsent() {
+export async function submitConsent(formData) {
   const sql = getSql();
-  const [participant] = await sql`
-    insert into participants (consented_at)
-    values (now())
-    returning id
+  const consentResponse = formData.get("consent_response");
+
+  if (consentResponse !== "agree" && consentResponse !== "disagree") {
+    throw new Error("Consent response is required.");
+  }
+
+  const hasConsentResponseColumn = await participantsHasConsentResponseColumn(sql);
+
+  const [participant] = hasConsentResponseColumn
+    ? await sql`
+        insert into participants (consent_response, consented_at)
+        values (${consentResponse}, ${consentResponse === "agree" ? new Date() : null})
+        returning id
+      `
+    : await sql`
+        insert into participants default values
+        returning id
+      `;
+
+  await sql`
+    insert into study_responses (
+      participant_id,
+      page_key,
+      section_title,
+      question_number,
+      question_text,
+      answer
+    )
+    values (
+      ${participant.id},
+      ${CONSENT_QUESTION.pageKey},
+      ${CONSENT_QUESTION.sectionTitle},
+      ${CONSENT_QUESTION.questionNumber},
+      ${CONSENT_QUESTION.questionText},
+      ${consentResponse === "agree"
+        ? "I agree to voluntarily take part in this study"
+        : "I do not agree to this consent form"}
+    )
+    on conflict (participant_id, page_key, question_number)
+    do update set
+      section_title = excluded.section_title,
+      question_text = excluded.question_text,
+      answer = excluded.answer,
+      updated_at = now()
   `;
+
+  if (consentResponse !== "agree") {
+    cookies().delete(PARTICIPANT_COOKIE);
+    redirect("/welcome?status=declined");
+  }
 
   cookies().set(PARTICIPANT_COOKIE, participant.id, {
     httpOnly: true,
@@ -155,54 +218,44 @@ export async function submitParticipantQuestions(formData) {
 
   const ageConfirmation = formData.get("age_confirmation");
   const age = formData.get("age");
-  const agePreferNotToSay = formData.get("age_prefer_not_to_say");
   const gender = formData.get("gender");
-  const genderSelfDescribe = formData.get("gender_self_describe");
   const higherEducation = formData.get("higher_education");
+  const higherEducationOther = String(formData.get("higher_education_other") ?? "").trim();
 
   if (ageConfirmation !== "yes") {
     throw new Error("Age confirmation is required.");
   }
 
-  const ageAnswer =
-    agePreferNotToSay === "yes" ? "Prefer not to say" : typeof age === "string" ? age : "";
+  const ageAnswer = typeof age === "string" ? age : "";
 
   if (!ageAnswer) {
     throw new Error("Age response is required.");
-  }
-
-  if (ageAnswer !== "Prefer not to say") {
-    const parsedAge = Number(ageAnswer);
-
-    if (!Number.isInteger(parsedAge) || parsedAge < 18) {
-      throw new Error("Participants must be 18 or older.");
-    }
   }
 
   if (typeof gender !== "string" || !gender) {
     throw new Error("Gender response is required.");
   }
 
-  const genderAnswer =
-    gender === "Prefer to self-describe:"
-      ? `Prefer to self-describe: ${String(genderSelfDescribe ?? "").trim()}`
-      : gender;
-
-  if (gender === "Prefer to self-describe:" && genderAnswer === "Prefer to self-describe:") {
-    throw new Error("A self-described gender response is required.");
-  }
-
   if (typeof higherEducation !== "string" || !higherEducation) {
     throw new Error("Higher education response is required.");
+  }
+
+  const higherEducationAnswer =
+    higherEducation === "Other" ? `Other: ${higherEducationOther}` : higherEducation;
+
+  if (higherEducation === "Other" && !higherEducationOther) {
+    throw new Error("An education response is required when Other is selected.");
   }
 
   for (const question of PARTICIPANT_QUESTIONS) {
     const answer =
       question.fieldName === "gender"
-        ? genderAnswer
+        ? gender
         : question.fieldName === "age"
           ? ageAnswer
-          : formData.get(question.fieldName);
+          : question.fieldName === "higher_education"
+            ? higherEducationAnswer
+            : formData.get(question.fieldName);
 
     if (typeof answer !== "string" || !answer) {
       throw new Error(`Missing answer for participant question ${question.questionNumber}.`);

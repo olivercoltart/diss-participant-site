@@ -1,16 +1,59 @@
-const GENDER_OPTIONS = [
-  "Female",
-  "Male",
-  "Non-binary",
-  "Prefer to self-describe:",
-  "Prefer not to say",
+"use client";
+
+import { useState } from "react";
+
+const AGE_OPTIONS = [
+  "18-24 years old",
+  "25-34 years old",
+  "35-44 years old",
+  "45-54 years old",
+  "Over 55 years old",
 ];
 
-const HIGHER_EDUCATION_OPTIONS = ["Yes", "No", "Prefer not to say"];
+const GENDER_OPTIONS = ["Male", "Female", "Prefer not to say / Other"];
+
+const EDUCATION_OPTIONS = [
+  "No formal education",
+  "Primary education",
+  "Vocational / Technical qualifications",
+  "Bachelor's degree",
+  "Master's degree",
+  "Doctoral degree",
+  "Other",
+];
 
 export default function ParticipantQuestionsForm({ action }) {
+  const [education, setEducation] = useState("");
+  const [educationOther, setEducationOther] = useState("");
+  const [showEducationWarning, setShowEducationWarning] = useState(false);
+
+  function handleEducationChange(event) {
+    const nextEducation = event.target.value;
+    setEducation(nextEducation);
+
+    if (nextEducation !== "Other") {
+      setShowEducationWarning(false);
+    }
+  }
+
+  function handleEducationOtherChange(event) {
+    const nextValue = event.target.value;
+    setEducationOther(nextValue);
+
+    if (nextValue.trim()) {
+      setShowEducationWarning(false);
+    }
+  }
+
+  function handleSubmit(event) {
+    if (education === "Other" && !educationOther.trim()) {
+      event.preventDefault();
+      setShowEducationWarning(true);
+    }
+  }
+
   return (
-    <form action={action}>
+    <form action={action} onSubmit={handleSubmit}>
       <div className="question">
         <label className="checkbox">
           <input required type="checkbox" name="age_confirmation" value="yes" /> I am over the age
@@ -20,38 +63,55 @@ export default function ParticipantQuestionsForm({ action }) {
 
       <div className="question">
         <h3>What is your age?</h3>
-        <input min="18" name="age" type="number" />
-        <label className="checkbox">
-          <input type="checkbox" name="age_prefer_not_to_say" value="yes" />
-          Prefer not to say
-        </label>
-        <p className="warning">If you enter an age, it must be 18 or older.</p>
+        <div className="options">
+          {AGE_OPTIONS.map((option) => (
+            <label key={option}>
+              <input required type="radio" name="age" value={option} /> {option}
+            </label>
+          ))}
+        </div>
       </div>
 
       <div className="question">
-        <h3>Which of the following best represents your gender identity?</h3>
+        <h3>What is your gender?</h3>
         <div className="options">
           {GENDER_OPTIONS.map((option) => (
             <label key={option}>
-              <input required type="radio" name="gender" value={option} />{" "}
+              <input required type="radio" name="gender" value={option} /> {option}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="question">
+        <h3>What is your highest level of education?</h3>
+        <div className="options">
+          {EDUCATION_OPTIONS.map((option) => (
+            <label key={option}>
+              <input
+                required
+                type="radio"
+                name="higher_education"
+                value={option}
+                checked={education === option}
+                onChange={handleEducationChange}
+              />{" "}
               {option}
             </label>
           ))}
         </div>
-        <input name="gender_self_describe" type="text" />
-      </div>
-
-      <div className="question">
-        <h3>
-          Have you completed a higher education degree? (e.g. Bachelors, Masters, PhD, etc.)
-        </h3>
-        <div className="options">
-          {HIGHER_EDUCATION_OPTIONS.map((option) => (
-            <label key={option}>
-              <input required type="radio" name="higher_education" value={option} /> {option}
-            </label>
-          ))}
-        </div>
+        <input
+          aria-invalid={showEducationWarning}
+          disabled={education !== "Other"}
+          name="higher_education_other"
+          onChange={handleEducationOtherChange}
+          placeholder="Other:"
+          type="text"
+          value={educationOther}
+        />
+        {showEducationWarning ? (
+          <p className="warning">Enter a response for Other before continuing.</p>
+        ) : null}
       </div>
 
       <nav className="nav">
