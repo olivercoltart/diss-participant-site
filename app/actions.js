@@ -64,27 +64,20 @@ const PARTICIPANT_QUESTIONS = [
     pageKey: "participant_questions",
     sectionTitle: "Participant Questions",
     questionNumber: 1,
-    questionText: "I am over the age of 18",
-    fieldName: "age_confirmation",
-  },
-  {
-    pageKey: "participant_questions",
-    sectionTitle: "Participant Questions",
-    questionNumber: 2,
     questionText: "What is your age?",
     fieldName: "age",
   },
   {
     pageKey: "participant_questions",
     sectionTitle: "Participant Questions",
-    questionNumber: 3,
+    questionNumber: 2,
     questionText: "What is your gender?",
     fieldName: "gender",
   },
   {
     pageKey: "participant_questions",
     sectionTitle: "Participant Questions",
-    questionNumber: 4,
+    questionNumber: 3,
     questionText: "What is your highest level of education?",
     fieldName: "higher_education",
   },
@@ -216,15 +209,10 @@ export async function submitParticipantQuestions(formData) {
   const sql = getSql();
   const participantId = getParticipantId();
 
-  const ageConfirmation = formData.get("age_confirmation");
   const age = formData.get("age");
   const gender = formData.get("gender");
   const higherEducation = formData.get("higher_education");
   const higherEducationOther = String(formData.get("higher_education_other") ?? "").trim();
-
-  if (ageConfirmation !== "yes") {
-    throw new Error("Age confirmation is required.");
-  }
 
   const ageAnswer = typeof age === "string" ? age : "";
 

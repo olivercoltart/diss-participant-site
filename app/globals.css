@@ -24,6 +24,11 @@ body.game-page-active {
   padding: 2rem 1rem 3rem;
 }
 
+.container:has(.likert-page) {
+  max-width: 1400px;
+  padding: 0.75rem 0.75rem 1rem;
+}
+
 .container.game-container-active {
   max-width: none;
   margin: 0;
@@ -92,6 +97,112 @@ body.game-page-active {
 .options {
   display: grid;
   gap: 0.35rem;
+}
+
+.likert-grid-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.likert-grid-scroll {
+  overflow-x: auto;
+}
+
+.likert-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.likert-grid-header,
+.likert-grid-row {
+  display: grid;
+  grid-template-columns: minmax(20rem, 2.4fr) repeat(5, minmax(6.5rem, 1fr));
+  align-items: center;
+}
+
+.likert-grid-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: 0.1rem;
+  border-bottom: 2px solid #dbe3f0;
+  background: #ffffff;
+}
+
+.likert-page {
+  padding: 0.75rem;
+}
+
+.likert-page > h1,
+.likert-page > h2,
+.likert-page > h3 {
+  margin: 0 0 0.4rem;
+}
+
+.likert-grid-header-question,
+.likert-grid-header-option {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0 0.5rem 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4b5563;
+  text-align: center;
+}
+
+.likert-grid-header-question {
+  text-align: left;
+}
+
+.likert-grid-header-score {
+  font-size: 0.9rem;
+  line-height: 1;
+  color: #111827;
+}
+
+.likert-grid-header-label {
+  line-height: 1.25;
+}
+
+.likert-grid-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.likert-grid-question {
+  margin: 0;
+  padding: 0.55rem 0.5rem;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.likert-grid-option {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 0.55rem 0.35rem;
+}
+
+.likert-grid-option input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .likert-grid {
+    min-width: 760px;
+  }
+
+  .likert-grid-header-question,
+  .likert-grid-header-option {
+    font-size: 0.75rem;
+    padding-bottom: 0.45rem;
+  }
+
+  .likert-grid-question {
+    font-size: 0.88rem;
+  }
 }
 
 .map-question {

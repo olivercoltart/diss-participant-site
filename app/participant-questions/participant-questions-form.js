@@ -55,13 +55,6 @@ export default function ParticipantQuestionsForm({ action }) {
   return (
     <form action={action} onSubmit={handleSubmit}>
       <div className="question">
-        <label className="checkbox">
-          <input required type="checkbox" name="age_confirmation" value="yes" /> I am over the age
-          of 18
-        </label>
-      </div>
-
-      <div className="question">
         <h3>What is your age?</h3>
         <div className="options">
           {AGE_OPTIONS.map((option) => (
