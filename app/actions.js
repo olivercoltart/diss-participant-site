@@ -81,6 +81,20 @@ const PARTICIPANT_QUESTIONS = [
     questionText: "What is your highest level of education?",
     fieldName: "higher_education",
   },
+  {
+    pageKey: "participant_questions",
+    sectionTitle: "Participant Questions",
+    questionNumber: 4,
+    questionText: "Have you played educational/serious games before?",
+    fieldName: "serious_games_experience",
+  },
+  {
+    pageKey: "participant_questions",
+    sectionTitle: "Participant Questions",
+    questionNumber: 5,
+    questionText: "If you have played educational/serious games, how often do you play them?",
+    fieldName: "serious_games_frequency",
+  },
 ];
 
 function getParticipantId() {
@@ -213,6 +227,8 @@ export async function submitParticipantQuestions(formData) {
   const gender = formData.get("gender");
   const higherEducation = formData.get("higher_education");
   const higherEducationOther = String(formData.get("higher_education_other") ?? "").trim();
+  const seriousGamesExperience = formData.get("serious_games_experience");
+  const seriousGamesFrequency = formData.get("serious_games_frequency");
 
   const ageAnswer = typeof age === "string" ? age : "";
 
@@ -235,6 +251,19 @@ export async function submitParticipantQuestions(formData) {
     throw new Error("An education response is required when Other is selected.");
   }
 
+  if (typeof seriousGamesExperience !== "string" || !seriousGamesExperience) {
+    throw new Error("Serious games experience response is required.");
+  }
+
+  if (seriousGamesExperience === "Yes") {
+    if (typeof seriousGamesFrequency !== "string" || !seriousGamesFrequency) {
+      throw new Error("Serious games frequency response is required when Yes is selected.");
+    }
+  }
+
+  const seriousGamesFrequencyAnswer =
+    seriousGamesExperience === "Yes" ? seriousGamesFrequency : "Not applicable";
+
   for (const question of PARTICIPANT_QUESTIONS) {
     const answer =
       question.fieldName === "gender"
@@ -243,6 +272,10 @@ export async function submitParticipantQuestions(formData) {
           ? ageAnswer
           : question.fieldName === "higher_education"
             ? higherEducationAnswer
+            : question.fieldName === "serious_games_experience"
+              ? seriousGamesExperience
+              : question.fieldName === "serious_games_frequency"
+                ? seriousGamesFrequencyAnswer
             : formData.get(question.fieldName);
 
     if (typeof answer !== "string" || !answer) {

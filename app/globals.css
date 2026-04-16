@@ -99,6 +99,52 @@ body.game-page-active {
   gap: 0.35rem;
 }
 
+.participant-questions-page {
+  padding: 0.85rem 1rem;
+}
+
+.participant-questions-page > h1 {
+  margin: 0 0 0.6rem;
+  font-size: 1.55rem;
+}
+
+.participant-questions-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.participant-questions-form .question {
+  margin-bottom: 0;
+}
+
+.participant-questions-form .question h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.participant-questions-form .options {
+  gap: 0.2rem;
+}
+
+.participant-questions-form label {
+  line-height: 1.25;
+}
+
+.participant-questions-form input[type="text"] {
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.participant-questions-form .warning {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+}
+
+.participant-questions-form .nav {
+  margin-top: 0.25rem;
+}
+
 .likert-grid-form {
   display: grid;
   gap: 0.5rem;
