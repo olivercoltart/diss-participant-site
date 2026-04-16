@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 const MAP_WIDTH = 649;
 const MAP_HEIGHT = 654;
 const MAP_IMAGE_URL = "https://lizardpoint.com/geography/images/maps/europe.gif";
+const SELECTION_COLORS = ["#f97316", "#14b8a6", "#8b5cf6", "#e11d48"];
 
 const AREA_MARKUP = String.raw`<area data-name="BEL" second-key="BEL" reg="Belgium" alt="" shape="poly" coords="239,402,240,395,245,394,248,393,251,391,250,383,244,383,245,380,246,376,238,374,233,370,228,373,218,370,212,374,210,376,226,390,226,396,235,392,235,400,238,401,240,400">
 <area data-name="LUX" second-key="LUX" reg="Luxembourg" alt="" shape="circle" coords="247,402,8">
@@ -89,7 +90,7 @@ function parseMapAreas(markup) {
 
 const MAP_AREAS = parseMapAreas(AREA_MARKUP);
 
-function renderSelectedShape(area) {
+function renderShape(area) {
   if (area.shape === "poly") {
     const points = [];
 
@@ -118,73 +119,162 @@ function renderSelectedShape(area) {
   return null;
 }
 
-export default function KnowledgeMapQuestion({ questionNumber, prompt }) {
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
-  const mapName = useMemo(() => `knowledge-map-${questionNumber}`, [questionNumber]);
+function shapeStyle(color, fillOpacity, strokeWidth) {
+  return {
+    fill: color,
+    fillOpacity,
+    stroke: color,
+    strokeWidth,
+  };
+}
 
-  const hoveredArea =
-    hoveredAreaIndex === null ? null : MAP_AREAS[hoveredAreaIndex] ?? null;
-  const selectedAreas = MAP_AREAS.filter((area) => area.name === selectedCountry);
+export default function KnowledgeMapQuestion({ startQuestionNumber, questions }) {
+  const [hoveredAreaIndex, setHoveredAreaIndex] = useState(null);
+  const [selectedCountries, setSelectedCountries] = useState(() => questions.map(() => ""));
+  const [selectionMessage, setSelectionMessage] = useState("");
+  const mapName = useMemo(
+    () => `knowledge-map-${startQuestionNumber}-${questions.length}`,
+    [startQuestionNumber, questions.length],
+  );
+
+  const hoveredArea = hoveredAreaIndex === null ? null : MAP_AREAS[hoveredAreaIndex] ?? null;
+  const activeQuestionIndex = selectedCountries.findIndex((country) => !country);
+  const currentQuestionIndex = activeQuestionIndex === -1 ? questions.length - 1 : activeQuestionIndex;
+  const currentTarget = activeQuestionIndex === -1 ? null : questions[activeQuestionIndex];
+
+  function resetSelections() {
+    setSelectedCountries(questions.map(() => ""));
+    setHoveredAreaIndex(null);
+    setSelectionMessage("");
+  }
+
+  function handleAreaSelect(areaName) {
+    if (activeQuestionIndex === -1) {
+      return;
+    }
+
+    setSelectedCountries((currentSelections) => {
+      const nextSelections = [...currentSelections];
+      nextSelections[activeQuestionIndex] = areaName;
+      return nextSelections;
+    });
+    setSelectionMessage("");
+  }
 
   return (
     <div className="question map-question">
-      <h3>
-        {questionNumber}. {prompt}
-      </h3>
-      <p className="map-question-copy">Click the country on the map.</p>
+      <div className="map-question-header">
+        <h3>
+          {startQuestionNumber}. On the map, select each of these countries in order: <br></br>
+          Spain, Luxembourg, The Netherlands, Romania
+        </h3>
+        <button className="button map-reset-button" type="button" onClick={resetSelections}>
+          Reset
+        </button>
+      </div>
+      <p>Smaller countries are highlighted with a red circle</p>
+      <p className="map-question-copy">
+        {currentTarget ? `Select an answer for ${currentTarget.answer} next.` : "All four countries selected."}
+      </p>
 
-      <input name={`q${questionNumber}`} type="hidden" value={selectedCountry} />
+      {questions.map((question, index) => {
+        const questionNumber = startQuestionNumber + index;
+
+        return (
+          <input
+            key={`q${questionNumber}`}
+            name={`q${questionNumber}`}
+            type="hidden"
+            value={selectedCountries[index]}
+          />
+        );
+      })}
 
       <div className="map-question-frame">
-        <div className="map-image-wrapper" role="group" aria-label={prompt}>
-          <img
-            alt="Map of Europe"
-            className="knowledge-map-image"
-            height={MAP_HEIGHT}
-            src={MAP_IMAGE_URL}
-            useMap={`#${mapName}`}
-            width={MAP_WIDTH}
-          />
+        <div className="map-image-crop">
+          <div className="map-image-wrapper" role="group" aria-label="Ordered map selection question">
+            <img
+              alt="Map of Europe"
+              className="knowledge-map-image"
+              height={MAP_HEIGHT}
+              src={MAP_IMAGE_URL}
+              useMap={`#${mapName}`}
+              width={MAP_WIDTH}
+            />
 
-          <svg
-            className="knowledge-map-overlay"
-            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-            aria-hidden="true"
-          >
-            {hoveredArea && selectedCountry !== hoveredArea.name ? (
-              <g className="map-area-hovered">{renderSelectedShape(hoveredArea)}</g>
-            ) : null}
+            <svg
+              className="knowledge-map-overlay"
+              viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+              aria-hidden="true"
+            >
+              {hoveredArea && currentTarget
+                ? MAP_AREAS.filter((area) => area.name === hoveredArea.name).map((area, index) => (
+                    <g
+                      className="map-area-hovered"
+                      key={`hover-${hoveredArea.name}-${index}`}
+                      style={shapeStyle(SELECTION_COLORS[currentQuestionIndex], 0.18, 2.5)}
+                    >
+                      {renderShape(area)}
+                    </g>
+                  ))
+                : null}
 
-            {selectedAreas.map((area, index) => (
-              <g className="map-area-selected" key={`${area.name}-${index}`}>
-                {renderSelectedShape(area)}
-              </g>
-            ))}
-          </svg>
+              {selectedCountries.map((countryName, index) =>
+                countryName
+                  ? MAP_AREAS.filter((area) => area.name === countryName).map((area, areaIndex) => (
+                      <g
+                        className="map-area-selected"
+                        key={`selected-${countryName}-${areaIndex}`}
+                        style={shapeStyle(SELECTION_COLORS[index], 0.38, 3)}
+                      >
+                        {renderShape(area)}
+                      </g>
+                    ))
+                  : null,
+              )}
+            </svg>
 
-          <map name={mapName}>
-            {MAP_AREAS.map((area, index) => (
-              <area
-                key={`${area.name}-${index}`}
-                alt={area.name}
-                aria-label={area.name}
-                coords={area.coords.join(",")}
-                href={`#${mapName}`}
-                onBlur={() => setHoveredAreaIndex(null)}
-                onClick={(event) => {
-                  event.preventDefault();
-                  setSelectedCountry(area.name);
-                }}
-                onFocus={() => setHoveredAreaIndex(index)}
-                onMouseEnter={() => setHoveredAreaIndex(index)}
-                onMouseLeave={() => setHoveredAreaIndex(null)}
-                shape={area.shape}
-              />
-            ))}
-          </map>
+            <map name={mapName}>
+              {MAP_AREAS.map((area, index) => (
+                <area
+                  key={`${area.name}-${index}`}
+                  alt={area.name}
+                  aria-label={area.name}
+                  coords={area.coords.join(",")}
+                  href={`#${mapName}`}
+                  onBlur={() => setHoveredAreaIndex(null)}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    handleAreaSelect(area.name);
+                  }}
+                  onFocus={() => setHoveredAreaIndex(index)}
+                  onMouseEnter={() => setHoveredAreaIndex(index)}
+                  onMouseLeave={() => setHoveredAreaIndex(null)}
+                  shape={area.shape}
+                />
+              ))}
+            </map>
+          </div>
         </div>
       </div>
+
+      <div className="map-selection-status" aria-live="polite">
+        {questions.map((question, index) => (
+          <span
+            className={`map-selection-pill${selectedCountries[index] ? " is-selected" : ""}`}
+            key={question.answer}
+            style={{
+              borderColor: SELECTION_COLORS[index],
+              color: selectedCountries[index] ? "#111827" : "#4b5563",
+              backgroundColor: selectedCountries[index] ? `${SELECTION_COLORS[index]}22` : "#ffffff",
+            }}
+          >
+            {index + 1}. {question.answer}
+          </span>
+        ))}
+      </div>
+
+      {selectionMessage ? <p className="warning">{selectionMessage}</p> : null}
     </div>
   );
 }

@@ -51,17 +51,12 @@ export default function KnowledgeAssessmentForm({ action, showPreStudyNotice = f
         );
       })}
 
-      {MAP_KNOWLEDGE_QUESTIONS.map((question, index) => {
-        const questionNumber = KNOWLEDGE_QUESTIONS.length + index + 1;
-
-        return (
-          <KnowledgeMapQuestion
-            key={`q${questionNumber}`}
-            questionNumber={questionNumber}
-            prompt={question.prompt}
-          />
-        );
-      })}
+      {MAP_KNOWLEDGE_QUESTIONS.length > 0 ? (
+        <KnowledgeMapQuestion
+          startQuestionNumber={KNOWLEDGE_QUESTIONS.length + 1}
+          questions={MAP_KNOWLEDGE_QUESTIONS}
+        />
+      ) : null}
 
       {showPreStudyNotice ? (
         <p>

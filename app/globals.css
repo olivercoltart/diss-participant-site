@@ -103,7 +103,7 @@ body.game-page-active {
   padding: 0.85rem 1rem;
 }
 
-.participant-questions-page > h1 {
+.participant-questions-page>h1 {
   margin: 0 0 0.6rem;
   font-size: 1.55rem;
 }
@@ -179,9 +179,9 @@ body.game-page-active {
   padding: 0.75rem;
 }
 
-.likert-page > h1,
-.likert-page > h2,
-.likert-page > h3 {
+.likert-page>h1,
+.likert-page>h2,
+.likert-page>h3 {
   margin: 0 0 0.4rem;
 }
 
@@ -256,9 +256,26 @@ body.game-page-active {
   padding-top: 1.25rem;
 }
 
+.map-question-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.map-question-header h3 {
+  margin: 0;
+}
+
 .map-question-copy {
-  margin-top: 0;
+  margin: 0.5rem 0 0;
   color: #4b5563;
+}
+
+.map-reset-button {
+  flex-shrink: 0;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.92rem;
 }
 
 .map-question-frame {
@@ -269,11 +286,17 @@ body.game-page-active {
   background: #f8fafc;
 }
 
+.map-image-crop {
+  width: 100%;
+  max-width: 649px;
+  height: 630px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
 .map-image-wrapper {
   position: relative;
   width: 100%;
-  max-width: 649px;
-  margin: 0 auto;
 }
 
 .knowledge-map-image {
@@ -293,17 +316,13 @@ body.game-page-active {
 .map-area-selected polygon,
 .map-area-selected circle,
 .map-area-selected rect {
-  fill: rgba(11, 95, 255, 0.42);
-  stroke: #0b5fff;
-  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
 }
 
 .map-area-hovered polygon,
 .map-area-hovered circle,
 .map-area-hovered rect {
-  fill: rgba(11, 95, 255, 0.2);
-  stroke: rgba(11, 95, 255, 0.9);
-  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 .map-question-status {
@@ -313,6 +332,31 @@ body.game-page-active {
 
 .map-question-status-label {
   color: #4b5563;
+}
+
+.map-selection-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.map-selection-pill {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .map-question-header {
+    flex-direction: column;
+  }
+
+  .map-reset-button {
+    align-self: flex-end;
+  }
 }
 
 iframe {
