@@ -4,8 +4,13 @@ import { useState } from "react";
 import KnowledgeMapQuestion from "./knowledge-map-question";
 import { KNOWLEDGE_QUESTIONS, MAP_KNOWLEDGE_QUESTIONS } from "../lib/study-content";
 
-export default function KnowledgeAssessmentForm({ action, showPreStudyNotice = false }) {
+export default function KnowledgeAssessmentForm({
+  action,
+  showPreStudyNotice = false,
+  additionalQuestion = "",
+}) {
   const [validationMessage, setValidationMessage] = useState("");
+  const additionalQuestionNumber = KNOWLEDGE_QUESTIONS.length + MAP_KNOWLEDGE_QUESTIONS.length + 1;
 
   function handleSubmit(event) {
     const formData = new FormData(event.currentTarget);
@@ -56,6 +61,20 @@ export default function KnowledgeAssessmentForm({ action, showPreStudyNotice = f
           startQuestionNumber={KNOWLEDGE_QUESTIONS.length + 1}
           questions={MAP_KNOWLEDGE_QUESTIONS}
         />
+      ) : null}
+
+      {additionalQuestion ? (
+        <div className="question" key="additional-thoughts">
+          <h3>
+            {additionalQuestionNumber}. {additionalQuestion}
+          </h3>
+          <textarea
+            name="additional_thoughts"
+            rows={5}
+            placeholder="Optional"
+            aria-label={`${additionalQuestionNumber}. ${additionalQuestion}`}
+          />
+        </div>
       ) : null}
 
       {showPreStudyNotice ? (

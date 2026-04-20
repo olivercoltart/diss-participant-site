@@ -6,7 +6,10 @@ export default function QuestionsTwoPage() {
     <section className="card">
       <h1>Post-Study Questions</h1>
       <h3>Baseline Knowledge</h3>
-      <KnowledgeAssessmentForm action={submitPostKnowledge} />
+      <KnowledgeAssessmentForm
+        action={submitPostKnowledge}
+        additionalQuestion="Do you have any additional thoughts on the game?"
+      />
     </section>
   );
 }

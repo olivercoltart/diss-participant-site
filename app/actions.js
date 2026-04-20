@@ -59,6 +59,12 @@ function enumerateKnowledgeQuestions(pageKey) {
 
 const PRE_KNOWLEDGE_QUESTIONS = enumerateKnowledgeQuestions("knowledge_pre");
 const POST_KNOWLEDGE_QUESTIONS = enumerateKnowledgeQuestions("knowledge_post");
+const POST_KNOWLEDGE_ADDITIONAL_QUESTION = {
+  pageKey: "knowledge_post",
+  sectionTitle: "Post-Study Feedback",
+  questionNumber: POST_KNOWLEDGE_QUESTIONS.length + 1,
+  questionText: "Do you have any additional thoughts on the game?",
+};
 const PARTICIPANT_QUESTIONS = [
   {
     pageKey: "participant_questions",
@@ -331,6 +337,41 @@ export async function submitPostKnowledge(formData) {
   await saveResponses(POST_KNOWLEDGE_QUESTIONS, formData);
 
   const participantId = getParticipantId();
+  const additionalThoughts = String(formData.get("additional_thoughts") ?? "").trim();
+
+  if (additionalThoughts) {
+    await sql`
+      insert into study_responses (
+        participant_id,
+        page_key,
+        section_title,
+        question_number,
+        question_text,
+        answer
+      )
+      values (
+        ${participantId},
+        ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.pageKey},
+        ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.sectionTitle},
+        ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.questionNumber},
+        ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.questionText},
+        ${additionalThoughts}
+      )
+      on conflict (participant_id, page_key, question_number)
+      do update set
+        section_title = excluded.section_title,
+        question_text = excluded.question_text,
+        answer = excluded.answer,
+        updated_at = now()
+    `;
+  } else {
+    await sql`
+      delete from study_responses
+      where participant_id = ${participantId}
+        and page_key = ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.pageKey}
+        and question_number = ${POST_KNOWLEDGE_ADDITIONAL_QUESTION.questionNumber}
+    `;
+  }
 
   await sql`
     update participants

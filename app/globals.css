@@ -94,6 +94,17 @@ body.game-page-active {
   margin-bottom: 0.5rem;
 }
 
+.question textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 7rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
 .options {
   display: grid;
   gap: 0.35rem;
