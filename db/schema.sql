@@ -15,6 +15,7 @@ create table if not exists study_responses (
   question_number integer not null,
   question_text text not null,
   answer text not null,
+  completed boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (participant_id, page_key, question_number)

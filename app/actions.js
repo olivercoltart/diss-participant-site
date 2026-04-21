@@ -65,6 +65,13 @@ const POST_KNOWLEDGE_ADDITIONAL_QUESTION = {
   questionNumber: POST_KNOWLEDGE_QUESTIONS.length + 1,
   questionText: "Do you have any additional thoughts on the game?",
 };
+const COMPLETION_RESPONSE = {
+  pageKey: "complete",
+  sectionTitle: "Study Completion",
+  questionNumber: 1,
+  questionText: "Participant reached the completion page.",
+  answer: "Completed",
+};
 const PARTICIPANT_QUESTIONS = [
   {
     pageKey: "participant_questions",
@@ -374,9 +381,41 @@ export async function submitPostKnowledge(formData) {
   }
 
   await sql`
+    insert into study_responses (
+      participant_id,
+      page_key,
+      section_title,
+      question_number,
+      question_text,
+      answer
+    )
+    values (
+      ${participantId},
+      ${COMPLETION_RESPONSE.pageKey},
+      ${COMPLETION_RESPONSE.sectionTitle},
+      ${COMPLETION_RESPONSE.questionNumber},
+      ${COMPLETION_RESPONSE.questionText},
+      ${COMPLETION_RESPONSE.answer}
+    )
+    on conflict (participant_id, page_key, question_number)
+    do update set
+      section_title = excluded.section_title,
+      question_text = excluded.question_text,
+      answer = excluded.answer,
+      updated_at = now()
+  `;
+
+  await sql`
     update participants
     set completed_at = now()
     where id = ${participantId}
+  `;
+
+  await sql`
+    update study_responses
+    set completed = true,
+        updated_at = now()
+    where participant_id = ${participantId}
   `;
 
   redirect("/complete");
