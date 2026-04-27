@@ -120,16 +120,27 @@ function getParticipantId() {
   return participantId;
 }
 
-async function participantsHasConsentResponseColumn(sql) {
-  const [column] = await sql`
-    select 1
-    from information_schema.columns
-    where table_name = 'participants'
-      and column_name = 'consent_response'
-    limit 1
-  `;
+async function createParticipant(sql, consentResponse) {
+  try {
+    const [participant] = await sql`
+      insert into participants (consent_response, consented_at)
+      values (${consentResponse}, ${consentResponse === "agree" ? new Date() : null})
+      returning id
+    `;
 
-  return Boolean(column);
+    return participant;
+  } catch (error) {
+    if (error?.code !== "42703") {
+      throw error;
+    }
+
+    const [participant] = await sql`
+      insert into participants default values
+      returning id
+    `;
+
+    return participant;
+  }
 }
 
 async function saveResponses(questionSet, formData) {
@@ -178,18 +189,7 @@ export async function submitConsent(formData) {
     throw new Error("Consent response is required.");
   }
 
-  const hasConsentResponseColumn = await participantsHasConsentResponseColumn(sql);
-
-  const [participant] = hasConsentResponseColumn
-    ? await sql`
-        insert into participants (consent_response, consented_at)
-        values (${consentResponse}, ${consentResponse === "agree" ? new Date() : null})
-        returning id
-      `
-    : await sql`
-        insert into participants default values
-        returning id
-      `;
+  const participant = await createParticipant(sql, consentResponse);
 
   await sql`
     insert into study_responses (

@@ -1,6 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button className="button" type="submit" disabled={pending} aria-disabled={pending}>
+      {pending ? "Continuing..." : "Continue"}
+    </button>
+  );
+}
 
 export default function ConsentForm({ action }) {
   const [consentResponse, setConsentResponse] = useState("");
@@ -38,9 +49,7 @@ export default function ConsentForm({ action }) {
       </div>
 
       <nav className="nav">
-        <button className="button" type="submit">
-          Continue
-        </button>
+        <SubmitButton />
       </nav>
     </form>
   );
