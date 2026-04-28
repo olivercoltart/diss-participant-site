@@ -11,6 +11,13 @@ import {
 } from "../lib/study-content";
 
 const PARTICIPANT_COOKIE = "participant_id";
+const LIKERT_SCORES = {
+  "Strongly Agree": 5,
+  Agree: 4,
+  Neutral: 3,
+  Disagree: 2,
+  "Strongly Disagree": 1,
+};
 
 function enumerateQuestions(sections, pageKey) {
   let questionNumber = 0;
@@ -161,6 +168,8 @@ async function saveResponses(questionSet, formData) {
       throw new Error(`Missing answer for question ${question.questionNumber}.`);
     }
 
+    const answerScore = LIKERT_SCORES[answer] ?? null;
+
     await sql`
       insert into study_responses (
         participant_id,
@@ -168,7 +177,8 @@ async function saveResponses(questionSet, formData) {
         section_title,
         question_number,
         question_text,
-        answer
+        answer,
+        answer_score
       )
       values (
         ${participantId},
@@ -176,13 +186,15 @@ async function saveResponses(questionSet, formData) {
         ${question.sectionTitle},
         ${question.questionNumber},
         ${question.questionText},
-        ${answer}
+        ${answer},
+        ${answerScore}
       )
       on conflict (participant_id, page_key, question_number)
       do update set
         section_title = excluded.section_title,
         question_text = excluded.question_text,
         answer = excluded.answer,
+        answer_score = excluded.answer_score,
         updated_at = now()
     `;
   }
