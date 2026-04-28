@@ -31,6 +31,13 @@ function enumerateQuestions(sections, pageKey) {
 
 const PRE_STUDY_QUESTIONS = enumerateQuestions(PRE_STUDY_SECTIONS, "questions_pre");
 const POST_STUDY_QUESTIONS = enumerateQuestions(POST_STUDY_SECTIONS, "questions_post");
+const POST_GAME_COMPLETION_QUESTION = {
+  pageKey: "questions_post",
+  sectionTitle: "Game Completion",
+  questionNumber: 0,
+  questionText: 'Did you complete the game? (You will have clicked "Finish" if completed)',
+};
+const POST_GAME_COMPLETION_OPTIONS = new Set(["Yes", "No", "I don't know"]);
 const CONSENT_QUESTION = {
   pageKey: "welcome",
   sectionTitle: "Study Consent Form",
@@ -332,6 +339,42 @@ export async function submitPreQuestions(formData) {
 }
 
 export async function submitPostQuestions(formData) {
+  const sql = getSql();
+  const participantId = getParticipantId();
+  const gameCompletionAnswer = formData.get("game_completion");
+
+  if (
+    typeof gameCompletionAnswer !== "string" ||
+    !POST_GAME_COMPLETION_OPTIONS.has(gameCompletionAnswer)
+  ) {
+    throw new Error("Game completion response is required.");
+  }
+
+  await sql`
+    insert into study_responses (
+      participant_id,
+      page_key,
+      section_title,
+      question_number,
+      question_text,
+      answer
+    )
+    values (
+      ${participantId},
+      ${POST_GAME_COMPLETION_QUESTION.pageKey},
+      ${POST_GAME_COMPLETION_QUESTION.sectionTitle},
+      ${POST_GAME_COMPLETION_QUESTION.questionNumber},
+      ${POST_GAME_COMPLETION_QUESTION.questionText},
+      ${gameCompletionAnswer}
+    )
+    on conflict (participant_id, page_key, question_number)
+    do update set
+      section_title = excluded.section_title,
+      question_text = excluded.question_text,
+      answer = excluded.answer,
+      updated_at = now()
+  `;
+
   await saveResponses(POST_STUDY_QUESTIONS, formData);
   redirect("/knowledge-post");
 }

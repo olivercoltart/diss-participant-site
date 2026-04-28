@@ -6,9 +6,21 @@ export default function QuestionsTwoPage() {
 
   return (
     <section className="card likert-page">
-      <h3>Post-Study GameX Perception Questions</h3>
+      <h3 className="post-questions-title">Post-Study GameX Perception Questions</h3>
 
       <form action={submitPostQuestions} className="likert-grid-form">
+        <fieldset className="post-completion-question">
+          <legend>Did you complete the game? (You will have clicked "Finish" if completed)</legend>
+          <div className="post-completion-options">
+            {["Yes", "No", "I don't know"].map((option) => (
+              <label key={option}>
+                <input required type="radio" name="game_completion" value={option} />
+                {option}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
         <div className="likert-grid-scroll">
           <div className="likert-grid" role="table" aria-label="Post-study Likert scale questions">
             <div className="likert-grid-header" role="row">

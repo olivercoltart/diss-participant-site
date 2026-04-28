@@ -6,9 +6,9 @@ export default function QuestionsTwoPage() {
     <section className="card">
       <h1>Pre-Study Geography Knowledge Check</h1>
       <p>
-        NB: Proceeding to the next page will open the game in your browser. Please allow the game a
-        few seconds to begin. Once you complete the game select "Finish" to
-        load the next page. This may take a few seconds.
+        Proceeding to the next page will open the game in your browser. Please allow the game a
+        few seconds to load. Once you complete the game select "Finish" to
+        load the next page.<br></br> <b>You can quit the game at any point through the pause menu.</b>
       </p>
       <h3>Baseline Knowledge</h3>
       <KnowledgeAssessmentForm action={submitPreKnowledge} />
