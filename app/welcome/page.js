@@ -9,7 +9,7 @@ export default function WelcomePage({ searchParams }) {
       <h1>Study Consent Form</h1>
       <p>Welcome and thank you for taking part in this study.</p>
       <p>Please read the information below before agreeing to participate.</p>
-      <p>Please use a <b>laptop or desktop</b> to complete this study.</p>
+      <p>Please use a <b>laptop or desktop computer</b> to complete this study.</p>
       <p>If you take part, please complete the survey in one sitting without refreshing or clicking back in your browser.</p>
 
       {hasDeclined ? (
