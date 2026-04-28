@@ -345,11 +345,19 @@ body.game-page-active {
   color: #4b5563;
 }
 
+.map-selection-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
 .map-selection-status {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 0.75rem;
 }
 
 .map-selection-pill {
@@ -365,8 +373,8 @@ body.game-page-active {
     flex-direction: column;
   }
 
-  .map-reset-button {
-    align-self: flex-end;
+  .map-selection-status {
+    justify-content: flex-start;
   }
 }
 

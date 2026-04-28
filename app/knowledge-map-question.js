@@ -168,11 +168,9 @@ export default function KnowledgeMapQuestion({ startQuestionNumber, questions })
           {startQuestionNumber}. On the map, select each of these countries in order: <br></br>
           Spain, Luxembourg, The Netherlands, Romania
         </h3>
-        <button className="button map-reset-button" type="button" onClick={resetSelections}>
-          Reset
-        </button>
       </div>
-      <p>Smaller countries are highlighted with a red circle</p>
+      <p>Smaller countries are highlighted with a red circle.</p>
+      <p>If you make a mistake, click "Reset Map Selection" under the map.</p>
       <p className="map-question-copy">
         {currentTarget ? `Select an answer for ${currentTarget.answer} next.` : "All four countries selected."}
       </p>
@@ -258,20 +256,26 @@ export default function KnowledgeMapQuestion({ startQuestionNumber, questions })
         </div>
       </div>
 
-      <div className="map-selection-status" aria-live="polite">
-        {questions.map((question, index) => (
-          <span
-            className={`map-selection-pill${selectedCountries[index] ? " is-selected" : ""}`}
-            key={question.answer}
-            style={{
-              borderColor: SELECTION_COLORS[index],
-              color: selectedCountries[index] ? "#111827" : "#4b5563",
-              backgroundColor: selectedCountries[index] ? `${SELECTION_COLORS[index]}22` : "#ffffff",
-            }}
-          >
-            {index + 1}. {question.answer}
-          </span>
-        ))}
+      <div className="map-selection-row">
+        <div className="map-selection-status" aria-live="polite">
+          {questions.map((question, index) => (
+            <span
+              className={`map-selection-pill${selectedCountries[index] ? " is-selected" : ""}`}
+              key={question.answer}
+              style={{
+                borderColor: SELECTION_COLORS[index],
+                color: selectedCountries[index] ? "#111827" : "#4b5563",
+                backgroundColor: selectedCountries[index] ? `${SELECTION_COLORS[index]}22` : "#ffffff",
+              }}
+            >
+              {index + 1}. {question.answer}
+            </span>
+          ))}
+        </div>
+
+        <button className="button map-reset-button" type="button" onClick={resetSelections}>
+          Reset Map Selection
+        </button>
       </div>
 
       {selectionMessage ? <p className="warning">{selectionMessage}</p> : null}

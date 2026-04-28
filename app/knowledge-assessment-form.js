@@ -6,7 +6,6 @@ import { KNOWLEDGE_QUESTIONS, MAP_KNOWLEDGE_QUESTIONS } from "../lib/study-conte
 
 export default function KnowledgeAssessmentForm({
   action,
-  showPreStudyNotice = false,
   additionalQuestion = "",
 }) {
   const [validationMessage, setValidationMessage] = useState("");
@@ -75,14 +74,6 @@ export default function KnowledgeAssessmentForm({
             aria-label={`${additionalQuestionNumber}. ${additionalQuestion}`}
           />
         </div>
-      ) : null}
-
-      {showPreStudyNotice ? (
-        <p>
-          NB: Proceeding to the next page will open the game in your browser. Please allow the
-          game a few seconds to begin once you select "Start". Once you complete the game select
-          "Finish" to load the next page. This may take a few seconds.
-        </p>
       ) : null}
 
       {validationMessage ? <p className="warning">{validationMessage}</p> : null}

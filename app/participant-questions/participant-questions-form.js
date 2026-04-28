@@ -59,11 +59,6 @@ export default function ParticipantQuestionsForm({ action }) {
   function handleSeriousGamesExperienceChange(event) {
     const nextValue = event.target.value;
     setSeriousGamesExperience(nextValue);
-
-    if (nextValue !== "Yes") {
-      setSeriousGamesFrequency("");
-      setShowSeriousGamesFrequencyWarning(false);
-    }
   }
 
   function handleSeriousGamesFrequencyChange(event) {
@@ -172,7 +167,6 @@ export default function ParticipantQuestionsForm({ action }) {
                 type="radio"
                 name="serious_games_frequency"
                 value={option}
-                disabled={seriousGamesExperience !== "Yes"}
                 checked={seriousGamesFrequency === option}
                 onChange={handleSeriousGamesFrequencyChange}
               />{" "}

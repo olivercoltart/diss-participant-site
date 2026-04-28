@@ -275,7 +275,9 @@ export async function submitParticipantQuestions(formData) {
   }
 
   const seriousGamesFrequencyAnswer =
-    seriousGamesExperience === "Yes" ? seriousGamesFrequency : "Not applicable";
+    typeof seriousGamesFrequency === "string" && seriousGamesFrequency
+      ? seriousGamesFrequency
+      : "Not applicable";
 
   for (const question of PARTICIPANT_QUESTIONS) {
     const answer =

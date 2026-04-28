@@ -6,7 +6,7 @@ export default function QuestionsPage() {
 
   return (
     <section className="card likert-page">
-      <h3>Pre-Study Questions</h3>
+      <h3>Pre-Study GameX Perception Questions</h3>
 
       <form action={submitPreQuestions} className="likert-grid-form">
         <div className="likert-grid-scroll">

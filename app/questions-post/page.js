@@ -6,7 +6,7 @@ export default function QuestionsTwoPage() {
 
   return (
     <section className="card likert-page">
-      <h3>Post-Study Questions</h3>
+      <h3>Post-Study GameX Perception Questions</h3>
 
       <form action={submitPostQuestions} className="likert-grid-form">
         <div className="likert-grid-scroll">
