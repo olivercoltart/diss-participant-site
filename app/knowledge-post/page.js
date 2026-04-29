@@ -8,7 +8,7 @@ export default function QuestionsTwoPage() {
       <h3>Baseline Knowledge</h3>
       <KnowledgeAssessmentForm
         action={submitPostKnowledge}
-        additionalQuestion="Do you have any additional thoughts on the game?"
+        additionalQuestion="Do you have any additional thoughts or improvements for the game?"
       />
     </section>
   );
